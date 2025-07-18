@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YuuDevelopment - CRUD Pesanan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-white via-sky-50 to-white min-h-screen p-6 font-sans">
+
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-6 border border-sky-100">
+    <!-- Nama Toko -->
+    <h1 class="text-3xl font-bold text-sky-700 text-center">YuuDevelopment - Manajemen Pesanan</h1>
+
+    <!-- Form Input -->
+    <form id="pesananForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input type="hidden" id="editIndex" value="">
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-600">Nama Pesanan</label>
+        <input type="text" id="namaPesanan" class="w-full border p-2 rounded focus:ring focus:ring-sky-300" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-600">Nama Pembeli</label>
+        <input type="text" id="namaPembeli" class="w-full border p-2 rounded focus:ring focus:ring-sky-300" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-600">Harga</label>
+        <input type="number" id="harga" class="w-full border p-2 rounded focus:ring focus:ring-sky-300" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-600">Tanggal</label>
+        <input type="date" id="tanggal" class="w-full border p-2 rounded focus:ring focus:ring-sky-300" required>
+      </div>
+
+      <div class="md:col-span-2">
+        <button type="submit" class="bg-sky-600 text-white px-6 py-2 rounded hover:bg-sky-700 transition w-full">
+          Simpan Pesanan
+        </button>
+      </div>
+    </form>
+
+    <!-- Tabel Data -->
+    <div class="overflow-x-auto mt-6">
+      <table class="w-full text-sm border border-gray-300 shadow-sm">
+        <thead class="bg-sky-100 text-sky-800">
+          <tr>
+            <th class="border p-2">#</th>
+            <th class="border p-2">Nama Pesanan</th>
+            <th class="border p-2">Nama Pembeli</th>
+            <th class="border p-2">Harga</th>
+            <th class="border p-2">Tanggal</th>
+            <th class="border p-2">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelPesanan" class="text-center bg-white"></tbody>
+      </table>
+    </div>
+
+    <!-- Total Harga -->
+    <div class="text-right mt-4 text-lg font-bold text-sky-700">
+      Total Harga: <span id="totalHarga">Rp0</span>
+    </div>
+  </div>
+
+  <script>
+    let pesananList = [];
+
+    function renderTabel() {
+      const tbody = document.getElementById('tabelPesanan');
+      const totalEl = document.getElementById('totalHarga');
+      tbody.innerHTML = '';
+
+      let total = 0;
+
+      pesananList.forEach((data, index) => {
+        total += parseFloat(data.harga);
+        tbody.innerHTML += `
+          <tr>
+            <td class="border p-2">${index + 1}</td>
+            <td class="border p-2">${data.namaPesanan}</td>
+            <td class="border p-2">${data.namaPembeli}</td>
+            <td class="border p-2">Rp${Number(data.harga).toLocaleString()}</td>
+            <td class="border p-2">${data.tanggal}</td>
+            <td class="border p-2 space-x-2">
+              <button onclick="editData(${index})" class="bg-yellow-400 px-2 py-1 rounded hover:bg-yellow-500">Edit</button>
+              <button onclick="hapusData(${index})" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Hapus</button>
+            </td>
+          </tr>`;
+      });
+
+      totalEl.textContent = 'Rp' + total.toLocaleString();
+    }
+
+    function resetForm() {
+      document.getElementById('pesananForm').reset();
+      document.getElementById('editIndex').value = '';
+    }
+
+    document.getElementById('pesananForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const namaPesanan = document.getElementById('namaPesanan').value;
+      const namaPembeli = document.getElementById('namaPembeli').value;
+      const harga = document.getElementById('harga').value;
+      const tanggal = document.getElementById('tanggal').value;
+      const editIndex = document.getElementById('editIndex').value;
+
+      const dataBaru = { namaPesanan, namaPembeli, harga, tanggal };
+
+      if (editIndex === '') {
+        pesananList.push(dataBaru);
+      } else {
+        pesananList[editIndex] = dataBaru;
+      }
+
+      renderTabel();
+      resetForm();
+    });
+
+    function editData(index) {
+      const data = pesananList[index];
+      document.getElementById('namaPesanan').value = data.namaPesanan;
+      document.getElementById('namaPembeli').value = data.namaPembeli;
+      document.getElementById('harga').value = data.harga;
+      document.getElementById('tanggal').value = data.tanggal;
+      document.getElementById('editIndex').value = index;
+    }
+
+    function hapusData(index) {
+      if (confirm('Yakin ingin menghapus pesanan ini?')) {
+        pesananList.splice(index, 1);
+        renderTabel();
+      }
+    }
+  </script>
+
+</body>
+</html>
